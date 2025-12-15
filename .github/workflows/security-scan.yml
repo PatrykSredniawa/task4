@@ -18,12 +18,14 @@ jobs:
         run: |
           docker build -t myapp:latest .
 
-      - name: Run Trivy scan
-        uses: aquasecurity/trivy-action@v0.12.0
-        with:
-          image-ref: 'myapp:latest'
-          vuln-type: 'os,library'
-          format: 'table'
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
 
       - name: Install Semgrep
         run: |
